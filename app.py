@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import joblib
 import os
+import traceback
 
 st.set_page_config(page_title="Despliegue de proyecto final", layout="wide")
 
@@ -31,8 +32,8 @@ def load_resources():
 try:
     scaler, model, le_internet = load_resources()
 except Exception as e:
-    st.error(f"❌ Error al cargar los archivos .joblib: {e}")
-    st.info("Por favor verifica que subiste la versión actualizada de los archivos .joblib generados en Colab.")
+    st.error("❌ Error crítico de deserialización al cargar los archivos .joblib")
+    st.code(traceback.format_exc())
     scaler, model, le_internet = None, None, None
 
 if scaler is None or model is None or le_internet is None:
@@ -119,10 +120,11 @@ if df_input is not None:
 
             with col2:
                 if prediction_proba is not None:
-                    st.metric("Probabilidad de Reprobar (Clase 0)", f"{prediction_proba[0][0]*100:.2f}%")
-                    st.metric("Probabilidad de Aprobar (Clase 1)", f"{prediction_proba[0][1]*100:.2f}%")
+                    st.metric("Probabilidad de Reprobar (Clase 0)", f"{(prediction_proba[0][0]*100):.2f}%")
+                    st.metric("Probabilidad de Aprobar (Clase 1)", f"{(prediction_proba[0][1]*100):.2f}%")
 
         except Exception as e:
             st.error(f"Ocurrió un error durante el procesamiento o predicción: {e}")
+            st.code(traceback.format_exc())
     else:
         st.error("Faltan recursos esenciales para realizar la predicción (modelo, escalador o codificador de etiquetas).")
